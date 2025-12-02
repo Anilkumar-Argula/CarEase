@@ -12,10 +12,12 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import uk.ac.tees.mad.carease.data.models.BookingPayload
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
-import uk.ac.tees.mad.carease.ui.screens.*
+import uk.ac.tees.mad.carease.ui.screens.LoginScreen
+import uk.ac.tees.mad.carease.ui.screens.MainScreen
+import uk.ac.tees.mad.carease.ui.screens.SignUpScreen
+import uk.ac.tees.mad.carease.ui.screens.SplashScreen
 import uk.ac.tees.mad.carease.viewmodels.AuthViewModel
 import java.net.URLDecoder
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
@@ -86,18 +88,18 @@ fun AppNavigation(
         composable(
             route = Screen.SelectService.route
         ) {
-            SelectServiceScreen(
-                onProceedToCarDetails={serviceSelection->
-                    // Serialize to JSON and encode for URL safety
-                    val json = gson.toJson(serviceSelection)
-                    val encodedJson = URLEncoder.encode(json, StandardCharsets.UTF_8.toString())
-                    navController.navigate(Screen.CarDetail.createRoute(encodedJson))
-//                    navController.navigate(Screen.CarDetail.route)
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
+//            SelectServiceScreen(
+//                onProceedToCarDetails={serviceSelection->
+//                    // Serialize to JSON and encode for URL safety
+//                    val json = gson.toJson(serviceSelection)
+//                    val encodedJson = URLEncoder.encode(json, StandardCharsets.UTF_8.toString())
+//                    navController.navigate(Screen.CarDetail.createRoute(encodedJson))
+////                    navController.navigate(Screen.CarDetail.route)
+//                },
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                }
+//            )
         }
 
 
@@ -109,24 +111,23 @@ fun AppNavigation(
                     type = NavType.StringType
                 }
             )
-        ) {
-                backStackEntry ->
+        ) { backStackEntry ->
             val encodedJson = backStackEntry.arguments?.getString("serviceSelection")
             val json = URLDecoder.decode(encodedJson, StandardCharsets.UTF_8.toString())
             val serviceSelection = gson.fromJson(json, ServiceSelection::class.java)
 
-            CarDetailScreen(
-                serviceSelection = serviceSelection,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onProceedToBooking = { bookingPayload ->
-                    // Similar encoding for next screen
-                    val bookingJson = gson.toJson(bookingPayload)
-                    val encodedBookingJson = URLEncoder.encode(bookingJson, StandardCharsets.UTF_8.toString())
-                    navController.navigate(Screen.Booking.createRoute(encodedBookingJson))
-                }
-            )
+//            CarDetailScreen(
+//                serviceSelection = serviceSelection,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onProceedToBooking = { bookingPayload ->
+//                    // Similar encoding for next screen
+//                    val bookingJson = gson.toJson(bookingPayload)
+//                    val encodedBookingJson = URLEncoder.encode(bookingJson, StandardCharsets.UTF_8.toString())
+//                    navController.navigate(Screen.Booking.createRoute(encodedBookingJson))
+//                }
+//            )
 //            CarDetailScreen()
         }
 
@@ -151,20 +152,20 @@ fun AppNavigation(
             val json = URLDecoder.decode(encodedJson, StandardCharsets.UTF_8.toString())
             val bookingPayload = gson.fromJson(json, BookingPayload::class.java)
 
-            BookingScreen(
-                bookingPayload = bookingPayload,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onBookingSuccess = {
-                    // Navigate to home or bookings screen
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Main.route) {
-                            inclusive = false
-                        }
-                    }
-                }
-            )
+//            BookingScreen(
+//                bookingPayload = bookingPayload,
+//                onNavigateBack = {
+//                    navController.popBackStack()
+//                },
+//                onBookingSuccess = {
+//                    // Navigate to home or bookings screen
+//                    navController.navigate(Screen.Main.route) {
+//                        popUpTo(Screen.Main.route) {
+//                            inclusive = false
+//                        }
+//                    }
+//                }
+//            )
         }
 
     }

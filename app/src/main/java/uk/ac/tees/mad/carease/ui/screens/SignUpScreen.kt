@@ -422,6 +422,10 @@ fun SignUpScreen(
                                     errorMessage = "Please enter your email"
                                     return@Button
                                 }
+                                phone.isBlank()->{
+                                    errorMessage="Please enter phone number"
+                                    return@Button
+                                }
                                 password.isBlank() -> {
                                     errorMessage = "Please enter a password"
                                     return@Button

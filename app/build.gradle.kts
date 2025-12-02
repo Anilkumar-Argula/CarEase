@@ -5,6 +5,9 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+
+    // kotlin parcelize
+    id("kotlin-parcelize")
 }
 
 android {
@@ -106,5 +109,12 @@ dependencies {
 
     // cloundinary
     implementation("com.cloudinary:cloudinary-android:3.1.1")
+
+    // Gson for navigation
+    implementation("com.google.code.gson:gson:2.10.1")
+
+
+    // Google Play Services Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }
