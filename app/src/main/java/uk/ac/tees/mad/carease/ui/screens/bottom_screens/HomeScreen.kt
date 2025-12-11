@@ -49,7 +49,8 @@ fun HomeScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
             // Permission granted, load weather
             viewModel.loadWeatherByLocation(context)
         }
@@ -207,10 +208,12 @@ fun HomeScreen(
 
                     // Suggested Service Card
                     if (uiState.suggestedService != null) {
-                        SuggestedServiceCard(service = uiState.suggestedService!!)
+                        SuggestedServiceCard(
+                            service = uiState.suggestedService!!,
+                            navigateToServiceScreen = navigateToServiceScreen
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-
 
 
                     // Book a Service Button (Primary CTA)
@@ -268,7 +271,7 @@ fun HomeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-                    }else {
+                    } else {
                         // Add this empty state
                         Spacer(modifier = Modifier.height(12.dp))
                         Card(
@@ -462,7 +465,10 @@ fun WeatherCard(weather: Weather) {
 }
 
 @Composable
-fun SuggestedServiceCard(service: Service) {
+fun SuggestedServiceCard(
+    service: Service,
+    navigateToServiceScreen: () -> Unit,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -522,7 +528,9 @@ fun SuggestedServiceCard(service: Service) {
                 }
 
                 Button(
-                    onClick = { /* TODO: Navigate to booking */ },
+                    onClick = {
+                        navigateToServiceScreen()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF3B82F6)
                     ),

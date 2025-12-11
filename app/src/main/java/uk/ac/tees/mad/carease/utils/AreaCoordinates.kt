@@ -1,7 +1,5 @@
 package uk.ac.tees.mad.carease.utils
 
-import kotlin.to
-
 object AreaCoordinates {
     // Map area IDs to coordinates
     private val coordinates = mapOf(

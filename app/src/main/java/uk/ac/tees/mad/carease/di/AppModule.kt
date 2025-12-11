@@ -11,8 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import uk.ac.tees.mad.carease.data.api.WeatherApiService
-import uk.ac.tees.mad.carease.data.local.BookingDao
-import uk.ac.tees.mad.carease.data.local.CarEaseDatabase
 import uk.ac.tees.mad.carease.data.repository.BookingRepository
 import uk.ac.tees.mad.carease.data.repository.CarDetailsRepository
 import uk.ac.tees.mad.carease.data.repository.HomeRepository
@@ -26,11 +24,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provideFirebaseAuth(): FirebaseAuth= FirebaseAuth.getInstance()
 
     @Provides
     @Singleton
-    fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provideFirestore(): FirebaseFirestore= FirebaseFirestore.getInstance()
 
 
     @Provides
@@ -41,7 +39,7 @@ object AppModule {
         weatherApiService: WeatherApiService,
         locationManager: LocationManager
     ): HomeRepository {
-        return HomeRepository(firestore, auth, weatherApiService, locationManager)
+        return HomeRepository(firestore, auth,weatherApiService, locationManager)
     }
 
     @Provides
@@ -57,10 +55,9 @@ object AppModule {
     @Singleton
     fun provideBookingRepository(
         firestore: FirebaseFirestore,
-        auth: FirebaseAuth,
-        dao: BookingDao
+        auth: FirebaseAuth
     ): BookingRepository {
-        return BookingRepository(firestore, auth, dao)
+        return BookingRepository(firestore, auth)
     }
 
 
@@ -97,10 +94,5 @@ object AppModule {
     @Singleton
     fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
         return retrofit.create(WeatherApiService::class.java)
-    }
-
-    @Provides
-    fun provideBookingDao(database: CarEaseDatabase): BookingDao {
-        return database.bookingDao()
     }
 }
