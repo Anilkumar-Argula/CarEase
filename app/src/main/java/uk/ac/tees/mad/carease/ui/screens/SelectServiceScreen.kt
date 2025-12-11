@@ -1,5 +1,6 @@
 package uk.ac.tees.mad.carease.ui.screens
 
+import android.R.attr.enabled
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,12 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import uk.ac.tees.mad.carease.data.models.Area
 import uk.ac.tees.mad.carease.data.models.Service
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
+import uk.ac.tees.mad.carease.viewmodels.SelectServiceUiState
 import uk.ac.tees.mad.carease.viewmodels.SelectServiceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +34,35 @@ fun SelectServiceScreen(
     viewModel: SelectServiceViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScrollState()
 
+    SelectServiceScreenContent(
+        uiState = uiState,
+        onSelectService = viewModel::selectService,
+        onSelectArea = viewModel::selectArea,
+        onPromoChange = viewModel::updatePromoCode,
+        onValidatePromo = viewModel::validatePromoCode,
+        onProceed = {
+            viewModel.getServiceSelection()?.let { onProceedToCarDetails(it) }
+        },
+        onNavigateBack = onNavigateBack
+    )
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectServiceScreenContent(
+    uiState: SelectServiceUiState,
+    onSelectService: (Service) -> Unit = {},
+    onSelectArea: (Area) -> Unit = {},
+    onPromoChange: (String) -> Unit = {},
+    onValidatePromo: () -> Unit = {},
+    onProceed: () -> Unit = {},
+    onNavigateBack: () -> Unit = {}
+) {
+
+    val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,7 +81,7 @@ fun SelectServiceScreen(
         }
     ) { paddingValues ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
@@ -91,7 +122,7 @@ fun SelectServiceScreen(
                     ServiceCard(
                         service = service,
                         isSelected = uiState.selectedService?.id == service.id,
-                        onClick = { viewModel.selectService(service) }
+                        onClick = { onSelectService(service) }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -164,7 +195,7 @@ fun SelectServiceScreen(
                                     }
                                 },
                                 onClick = {
-                                    viewModel.selectArea(area)
+                                    onSelectArea(area)
                                     expandedArea = false
                                 }
                             )
@@ -191,7 +222,7 @@ fun SelectServiceScreen(
                 ) {
                     OutlinedTextField(
                         value = uiState.promoCode,
-                        onValueChange = { viewModel.updatePromoCode(it) },
+                        onValueChange = { onPromoChange(it) },
                         label = { Text("Enter code") },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
@@ -203,7 +234,7 @@ fun SelectServiceScreen(
                     )
 
                     Button(
-                        onClick = { viewModel.validatePromoCode() },
+                        onClick = { onValidatePromo() },
                         modifier = Modifier.height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF3B82F6)
@@ -287,7 +318,11 @@ fun SelectServiceScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text("Discount:", color = Color(0xFF10B981))
-                                    Text("-£$discount", color = Color(0xFF10B981), fontWeight = FontWeight.Medium)
+                                    Text(
+                                        "-£$discount",
+                                        color = Color(0xFF10B981),
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 }
                             }
 
@@ -326,14 +361,16 @@ fun SelectServiceScreen(
 
                 // Proceed Button
                 Button(
-                    onClick = {
-                        val selection = viewModel.getServiceSelection()
-                        if (selection != null) {
-                            // Convert to JSON and pass
-                            // For now, just navigate with encoded data
-                            onProceedToCarDetails(selection)
-                        }
-                    },
+                    onClick = onProceed
+//                    {
+//                        val selection = viewModel.getServiceSelection()
+//                        if (selection != null) {
+//                            // Convert to JSON and pass
+//                            // For now, just navigate with encoded data
+//                            onProceedToCarDetails(selection)
+//                        }
+//                    }
+                    ,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -374,7 +411,41 @@ fun SelectServiceScreen(
             }
         }
     }
+
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun SelectServiceScreenPreview() {
+
+    val fakeServices = listOf(
+        Service(id="1", name="Car Wash", description="Basic wash", price=10.0, duration=20, type="WASH"),
+        Service(id="2", name="Full Service", description="Inside + outside", price=25.0, duration=45, type="SERVICE")
+    )
+
+    val fakeAreas = listOf(
+        Area(id="A1", name="Central", pricingMultiplier = 1.0),
+        Area(id="A2", name="Airport", pricingMultiplier = 1.3)
+    )
+
+    val previewState = SelectServiceUiState(
+        isLoading = false,
+        services = fakeServices,
+        areas = fakeAreas,
+        selectedService = fakeServices[0],
+        selectedArea = fakeAreas[1],
+        promoCode = "SAVE10",
+        promoMessage = "10% discount applied",
+        discount = 3.0,
+        errorMessage = null,
+        isPromoValid = true,
+        canProceed = true
+    )
+
+    SelectServiceScreenContent(uiState = previewState)
+}
+
 
 @Composable
 fun ServiceCard(
