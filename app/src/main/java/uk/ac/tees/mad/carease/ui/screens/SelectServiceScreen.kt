@@ -415,38 +415,6 @@ fun SelectServiceScreenContent(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun SelectServiceScreenPreview() {
-
-    val fakeServices = listOf(
-        Service(id="1", name="Car Wash", description="Basic wash", price=10.0, duration=20, type="WASH"),
-        Service(id="2", name="Full Service", description="Inside + outside", price=25.0, duration=45, type="SERVICE")
-    )
-
-    val fakeAreas = listOf(
-        Area(id="A1", name="Central", pricingMultiplier = 1.0),
-        Area(id="A2", name="Airport", pricingMultiplier = 1.3)
-    )
-
-    val previewState = SelectServiceUiState(
-        isLoading = false,
-        services = fakeServices,
-        areas = fakeAreas,
-        selectedService = fakeServices[0],
-        selectedArea = fakeAreas[1],
-        promoCode = "SAVE10",
-        promoMessage = "10% discount applied",
-        discount = 3.0,
-        errorMessage = null,
-        isPromoValid = true,
-        canProceed = true
-    )
-
-    SelectServiceScreenContent(uiState = previewState)
-}
-
-
 @Composable
 fun ServiceCard(
     service: Service,
@@ -525,4 +493,36 @@ fun ServiceCard(
             }
         }
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun SelectServiceScreenPreview() {
+
+    val fakeServices = listOf(
+        Service(id="1", name="Car Wash", description="Basic wash", price=10.0, duration=20, type="WASH"),
+        Service(id="2", name="Full Service", description="Inside + outside", price=25.0, duration=45, type="SERVICE")
+    )
+
+    val fakeAreas = listOf(
+        Area(id="A1", name="Central", pricingMultiplier = 1.0),
+        Area(id="A2", name="Airport", pricingMultiplier = 1.3)
+    )
+
+    val previewState = SelectServiceUiState(
+        isLoading = false,
+        services = fakeServices,
+        areas = fakeAreas,
+        selectedService = fakeServices[0],
+        selectedArea = fakeAreas[1],
+        promoCode = "SAVE10",
+        promoMessage = "10% discount applied",
+        discount = 3.0,
+        errorMessage = null,
+        isPromoValid = true,
+        canProceed = true
+    )
+
+    SelectServiceScreenContent(uiState = previewState)
 }

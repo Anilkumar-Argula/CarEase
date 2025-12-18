@@ -25,11 +25,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.Timestamp
+import kotlinx.coroutines.flow.MutableStateFlow
 import uk.ac.tees.mad.carease.data.models.Booking
 import uk.ac.tees.mad.carease.data.models.Service
+import uk.ac.tees.mad.carease.data.models.UserProfile
 import uk.ac.tees.mad.carease.data.models.Weather
+import uk.ac.tees.mad.carease.viewmodels.HomeUiState
 import uk.ac.tees.mad.carease.viewmodels.HomeViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -109,6 +115,36 @@ fun HomeScreen(
 //        )
 //    }
 
+    HomeScreenContent(
+        modifier = modifier,
+        isLoading = uiState.isLoading,
+        isOnline = uiState.isOnline,
+        userProfile = uiState.userProfile,
+        weather = uiState.weather,
+        suggestedService = uiState.suggestedService,
+        recentBookings = uiState.recentBookings,
+        errorMessage = uiState.errorMessage,
+        onNavigateToService = navigateToServiceScreen,
+        onRefresh = { viewModel.refreshData(context) }
+    )
+
+}
+
+@Composable
+fun HomeScreenContent(
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
+    isOnline: Boolean = true,
+    userProfile: UserProfile? = null,
+    weather: Weather? = null,
+    suggestedService: Service? = null,
+    recentBookings: List<Booking> = emptyList(),
+    errorMessage: String? = null,
+    onNavigateToService: () -> Unit = {},
+    onRefresh: () -> Unit = {}
+){
+
+    val scrollState=rememberScrollState()
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -134,7 +170,7 @@ fun HomeScreen(
             ) {
                 Column {
                     // Offline Banner
-                    if (!uiState.isOnline) {
+                    if (!isOnline) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -167,7 +203,7 @@ fun HomeScreen(
 
                     // Welcome Text
                     Text(
-                        text = "Welcome${if (uiState.userProfile?.fullName?.isNotBlank() == true) ", ${uiState.userProfile?.fullName}" else ""}!",
+                        text = "Welcome${if (userProfile?.fullName?.isNotBlank() == true) ", ${userProfile.fullName}" else ""}!",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -190,7 +226,7 @@ fun HomeScreen(
                     .padding(16.dp)
             ) {
                 // Loading State
-                if (uiState.isLoading) {
+                if (isLoading) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -201,16 +237,16 @@ fun HomeScreen(
                     }
                 } else {
                     // Weather Tile
-                    if (uiState.weather != null) {
-                        WeatherCard(weather = uiState.weather!!)
+                    if (weather != null) {
+                        WeatherCard(weather = weather)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
                     // Suggested Service Card
-                    if (uiState.suggestedService != null) {
+                    if (suggestedService != null) {
                         SuggestedServiceCard(
-                            service = uiState.suggestedService!!,
-                            navigateToServiceScreen = navigateToServiceScreen
+                            service = suggestedService,
+                            navigateToServiceScreen = onNavigateToService
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -219,7 +255,7 @@ fun HomeScreen(
                     // Book a Service Button (Primary CTA)
                     Button(
                         onClick = {
-                            navigateToServiceScreen()
+                            onNavigateToService()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -261,12 +297,13 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1E3A8A)
                     )
-                    if (uiState.recentBookings.isNotEmpty()) {
+                    if (recentBookings.isNotEmpty()) {
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        uiState.recentBookings.forEach { booking ->
+                        recentBookings.forEach { booking ->
                             RecentBookingCard(booking = booking)
+//                            BookingCard(booking)
                             Spacer(modifier = Modifier.height(8.dp))
                         }
 
@@ -300,30 +337,30 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Refresh Button
-                        OutlinedButton(
-                            onClick = { viewModel.refreshData(context) },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Refresh",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Refresh")
-                        }
-                    }
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+//                    ) {
+//                        // Refresh Button
+//                        OutlinedButton(
+//                            onClick = { onRefresh() },
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(48.dp),
+//                            shape = RoundedCornerShape(12.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Refresh,
+//                                contentDescription = "Refresh",
+//                                modifier = Modifier.size(20.dp)
+//                            )
+//                            Spacer(modifier = Modifier.width(4.dp))
+//                            Text("Refresh")
+//                        }
+//                    }
 
                     // Error Message
-                    if (uiState.errorMessage != null) {
+                    if (errorMessage != null) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -333,7 +370,7 @@ fun HomeScreen(
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Text(
-                                text = uiState.errorMessage!!,
+                                text = errorMessage,
                                 color = Color(0xFFDC2626),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(16.dp)
@@ -344,6 +381,7 @@ fun HomeScreen(
             }
         }
     }
+
 }
 
 @Composable
@@ -546,4 +584,65 @@ fun SuggestedServiceCard(
 fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {
     val sdf = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
     return sdf.format(timestamp.toDate())
+}
+
+@Preview(showBackground = true,)
+@Composable
+fun HomeScreenPreview() {
+    MaterialTheme {
+        HomeScreenContent(
+            isLoading = false,
+            isOnline = true,
+            userProfile = UserProfile(
+                uid = "1",
+                fullName = "John Doe",
+                email = "john@example.com"
+            ),
+            weather = Weather(
+                areaId = "area1",
+                temperature = 22.0,
+                condition = "Sunny",
+                bestTimeForWash = "Morning (8-11 AM)",
+                worstTimeForWash = "Evening (5-7 PM)",
+                lastUpdated = Timestamp.now()
+            ),
+            suggestedService = Service(
+                id = "1",
+                name = "Premium Wash & Wax",
+                description = "Deep clean with protective wax coating",
+                price = 45.0,
+                duration = 60
+            ),
+            recentBookings = listOf(
+                Booking(
+                    bookingId = "1",
+                    userId = "user1",
+                    serviceName = "Basic Wash",
+                    serviceType = "wash",
+                    scheduledDate = Timestamp.now(),
+                    timeSlot = "Today, 2:00 PM",
+                    totalPrice = 25.0,
+                    status = "CONFIRMED",
+                    carMake = "Toyota",
+                    carModel = "Camry",
+                    areaName = "Downtown",
+                    createdAt = Timestamp.now()
+                ),
+                Booking(
+                    bookingId = "2",
+                    userId = "user1",
+                    serviceName = "Interior Detailing",
+                    serviceType = "detailing",
+                    scheduledDate = Timestamp.now(),
+                    timeSlot = "Tomorrow, 10:00 AM",
+                    totalPrice = 65.0,
+                    status = "PENDING",
+                    carMake = "Honda",
+                    carModel = "Civic",
+                    areaName = "City Center",
+                    createdAt = Timestamp.now()
+                )
+            )
+        )
+    }
 }

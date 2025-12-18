@@ -226,6 +226,69 @@ fun BookingScreenContent(
 
                 Spacer(Modifier.height(24.dp))
 
+                // CONTACT INFORMATION
+                if (uiState.userName.isNotBlank() || uiState.userEmail.isNotBlank()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFF3F4F6)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Contact Information",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1E3A8A)
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            if (uiState.userName.isNotBlank()) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.Person,
+                                        null,
+                                        tint = Color(0xFF6B7280),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = uiState.userName,
+                                        color = Color(0xFF1E3A8A)
+                                    )
+                                }
+                                Spacer(Modifier.height(8.dp))
+                            }
+
+                            if (uiState.userEmail.isNotBlank()) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.Email,
+                                        null,
+                                        tint = Color(0xFF6B7280),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = uiState.userEmail,
+                                        color = Color(0xFF1E3A8A)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+                }
+
+
+
                 // CONFIRM BOOKING
                 Button(
                     onClick = onConfirmBooking,
