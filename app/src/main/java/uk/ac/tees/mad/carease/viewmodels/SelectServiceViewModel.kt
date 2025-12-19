@@ -2,7 +2,6 @@ package uk.ac.tees.mad.carease.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -10,7 +9,6 @@ import uk.ac.tees.mad.carease.data.models.Area
 import uk.ac.tees.mad.carease.data.models.Service
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
 import uk.ac.tees.mad.carease.data.repository.SelectServiceRepository
-import javax.inject.Inject
 
 
 data class SelectServiceUiState(
@@ -27,8 +25,8 @@ data class SelectServiceUiState(
     val canProceed: Boolean = false
 )
 
-@HiltViewModel
-class SelectServiceViewModel @Inject constructor(
+
+class SelectServiceViewModel(
     private val repository: SelectServiceRepository
 ) : ViewModel() {
 

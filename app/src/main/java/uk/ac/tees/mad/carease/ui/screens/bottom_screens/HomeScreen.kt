@@ -5,16 +5,33 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.WifiOff
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,14 +45,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Timestamp
-import kotlinx.coroutines.flow.MutableStateFlow
 import uk.ac.tees.mad.carease.data.models.Booking
 import uk.ac.tees.mad.carease.data.models.Service
 import uk.ac.tees.mad.carease.data.models.UserProfile
 import uk.ac.tees.mad.carease.data.models.Weather
-import uk.ac.tees.mad.carease.viewmodels.HomeUiState
 import uk.ac.tees.mad.carease.viewmodels.HomeViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -142,9 +156,9 @@ fun HomeScreenContent(
     errorMessage: String? = null,
     onNavigateToService: () -> Unit = {},
     onRefresh: () -> Unit = {}
-){
+) {
 
-    val scrollState=rememberScrollState()
+    val scrollState = rememberScrollState()
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -386,6 +400,7 @@ fun HomeScreenContent(
 
 @Composable
 fun RecentBookingCard(booking: Booking) {
+    val formattedDate = booking.scheduledDate?.let { formatTimestamp(it) } ?: "N/A"
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -412,6 +427,11 @@ fun RecentBookingCard(booking: Booking) {
                 Text(
                     text = "${booking.carMake} ${booking.carModel}",
                     fontSize = 14.sp,
+                    color = Color(0xFF6B7280)
+                )
+                Text(
+                    text = "$formattedDate",
+                    fontSize = 12.sp,
                     color = Color(0xFF6B7280)
                 )
                 Text(
@@ -581,12 +601,12 @@ fun SuggestedServiceCard(
     }
 }
 
-fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {
-    val sdf = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
+fun formatTimestamp(timestamp: Timestamp): String {
+    val sdf = SimpleDateFormat("dd MMM YY", Locale.getDefault())
     return sdf.format(timestamp.toDate())
 }
 
-@Preview(showBackground = true,)
+@Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     MaterialTheme {

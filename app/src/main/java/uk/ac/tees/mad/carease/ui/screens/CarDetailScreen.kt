@@ -6,14 +6,54 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,14 +64,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import uk.ac.tees.mad.carease.AppContainer
 import uk.ac.tees.mad.carease.data.models.Addon
 import uk.ac.tees.mad.carease.data.models.BookingPayload
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
 import uk.ac.tees.mad.carease.viewmodels.CarDetailsUiState
 import uk.ac.tees.mad.carease.viewmodels.CarDetailsViewModel
+import uk.ac.tees.mad.carease.viewmodels.CarDetailsViewModelFactory
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,8 +82,13 @@ fun CarDetailScreen(
     serviceSelection: ServiceSelection,
     onNavigateBack: () -> Unit,
     onProceedToBooking: (BookingPayload) -> Unit,
-    viewModel: CarDetailsViewModel = hiltViewModel()
+    container: AppContainer
 ) {
+
+    val viewModel: CarDetailsViewModel = viewModel(
+        factory = CarDetailsViewModelFactory(container.carDetailsRepository)
+    )
+
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
@@ -168,9 +214,9 @@ fun CarDetailScreenContent(
     onColorChange: (String) -> Unit = {},
     onNotesChange: (String) -> Unit = {},
     onAddonToggle: (String) -> Unit = {},
-    clearError:()->Unit={},
+    clearError: () -> Unit = {},
     onProceed: () -> Unit = {}
-){
+) {
     val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
@@ -325,7 +371,7 @@ fun CarDetailScreenContent(
             // Car Model
             OutlinedTextField(
                 value = uiState.carModel,
-                onValueChange = {  onCarModelChange(it) },
+                onValueChange = { onCarModelChange(it) },
                 label = { Text("Model *") },
                 placeholder = { Text("e.g., Camry") },
                 leadingIcon = {
@@ -345,7 +391,7 @@ fun CarDetailScreenContent(
             // Registration Number
             OutlinedTextField(
                 value = uiState.registrationNumber,
-                onValueChange = {   onRegChange(it) },
+                onValueChange = { onRegChange(it) },
                 label = { Text("Registration Number *") },
                 placeholder = { Text("e.g., AB12 CDE") },
                 leadingIcon = {
@@ -365,7 +411,7 @@ fun CarDetailScreenContent(
             // Car Color
             OutlinedTextField(
                 value = uiState.carColor,
-                onValueChange = {   onColorChange(it) },
+                onValueChange = { onColorChange(it) },
                 label = { Text("Color *") },
                 placeholder = { Text("e.g., Silver") },
                 leadingIcon = {
@@ -414,7 +460,7 @@ fun CarDetailScreenContent(
             uiState.availableAddons.forEach { addon ->
                 AddonCheckboxItem(
                     addon = addon,
-                    onToggle = {  onAddonToggle(addon.id) }
+                    onToggle = { onAddonToggle(addon.id) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -550,7 +596,6 @@ fun CarDetailsPreview() {
         serviceSelection = serviceSelection
     )
 }
-
 
 
 @Composable

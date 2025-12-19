@@ -2,14 +2,12 @@ package uk.ac.tees.mad.carease.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import uk.ac.tees.mad.carease.data.models.BookingPayload
 import uk.ac.tees.mad.carease.data.repository.BookingRepository
-import java.util.*
-import javax.inject.Inject
 
 data class BookingUiState(
     val isLoading: Boolean = false,
@@ -38,8 +36,7 @@ fun generateTimeSlots(): List<String> {
     )
 }
 
-@HiltViewModel
-class BookingViewModel @Inject constructor(
+class BookingViewModel(
     private val repository: BookingRepository
 ) : ViewModel() {
 
@@ -108,7 +105,7 @@ class BookingViewModel @Inject constructor(
     }
 
     fun createBooking(
-        bookingPayload: uk.ac.tees.mad.carease.data.models.BookingPayload
+        bookingPayload: BookingPayload
     ) {
         val date = _uiState.value.selectedDate
         val timeSlot = _uiState.value.selectedTimeSlot

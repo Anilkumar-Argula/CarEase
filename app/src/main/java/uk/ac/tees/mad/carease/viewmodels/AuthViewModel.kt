@@ -1,22 +1,22 @@
 package uk.ac.tees.mad.carease.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import uk.ac.tees.mad.carease.data.local.BookingDao
 import uk.ac.tees.mad.carease.data.models.UserProfile
-import javax.inject.Inject
 
-
-@HiltViewModel
-class AuthViewModel @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+class AuthViewModel(
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore,
+    private val dao: BookingDao,
 ) : ViewModel() {
 
 
-    fun isLoggedIn() = firebaseAuth.currentUser != null
+    fun isLoggedIn() = auth.currentUser != null
 
     fun login(
         email: String,
@@ -25,7 +25,7 @@ class AuthViewModel @Inject constructor(
         onError: (String) -> Unit,
     ) {
 
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 onSuccess()
             }
@@ -50,23 +50,23 @@ class AuthViewModel @Inject constructor(
         fullName: String,
         email: String,
         password: String,
-        phone:String,
+        phone: String,
         defaultVehicle: String?,
         preferredArea: String?,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val userId = authResult.user?.uid ?: return@addOnSuccessListener
 
-                val userProfile= UserProfile(
+                val userProfile = UserProfile(
                     uid = userId,
                     fullName = fullName,
                     email = email,
                     phone = phone,
-                    defaultVehicle = defaultVehicle?:"",
-                    preferredArea = preferredArea?:"",
+                    defaultVehicle = defaultVehicle ?: "",
+                    preferredArea = preferredArea ?: "",
                     notificationsEnabled = true,
                     createdAt = Timestamp.now()
                 )
@@ -114,10 +114,27 @@ class AuthViewModel @Inject constructor(
             }
     }
 
-    fun logOut(onSuccess: () -> Unit){
-        firebaseAuth.signOut()
-        onSuccess()
+//    fun logOut(onSuccess: () -> Unit) {
+//        val userId = firebaseAuth.currentUser?.uid
+//        viewModelScope.launch {
+//            dao.clearUser(userId = userId!!)
+//        }
+//        firebaseAuth.signOut()
+//        onSuccess()
+//    }
+
+    fun logOut(onSuccess: () -> Unit) {
+        val userId = auth.currentUser?.uid
+
+        viewModelScope.launch {
+            if (userId != null) {
+                dao.clearUser(userId)
+            }
+            auth.signOut()
+            onSuccess()
+        }
     }
+
 
 
 }

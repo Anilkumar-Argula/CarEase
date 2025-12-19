@@ -2,30 +2,42 @@ package uk.ac.tees.mad.carease.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
+import uk.ac.tees.mad.carease.AppContainer
 import uk.ac.tees.mad.carease.data.models.BookingPayload
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
-import uk.ac.tees.mad.carease.ui.screens.*
+import uk.ac.tees.mad.carease.ui.screens.CarDetailScreen
+import uk.ac.tees.mad.carease.ui.screens.LoginScreen
+import uk.ac.tees.mad.carease.ui.screens.MainScreen
+import uk.ac.tees.mad.carease.ui.screens.SelectServiceScreen
+import uk.ac.tees.mad.carease.ui.screens.SignUpScreen
+import uk.ac.tees.mad.carease.ui.screens.SplashScreen
 import uk.ac.tees.mad.carease.ui.screens.bottom_screens.BookingScreen
 import uk.ac.tees.mad.carease.viewmodels.AuthViewModel
+import uk.ac.tees.mad.carease.viewmodels.AuthViewModelFactory
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier
+    container: AppContainer
 ) {
 
     val navController = rememberNavController()
-    val authViewModel = hiltViewModel<AuthViewModel>()
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(
+            auth = container.auth,
+            firestore = container.firestore,
+            bookingDao = container.bookingDao
+        )
+    )
 
     val gson = remember { Gson() }
 
@@ -69,8 +81,10 @@ fun AppNavigation(
             route = Screen.Main.route
         ) {
             MainScreen(
+                container = container,
                 logout = {
                     authViewModel.logOut {
+
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) {
                                 inclusive = true
@@ -88,6 +102,7 @@ fun AppNavigation(
             route = Screen.SelectService.route
         ) {
             SelectServiceScreen(
+                container = container,
                 onProceedToCarDetails = { serviceSelection ->
                     // Serialize to JSON and encode for URL safety
                     val json = gson.toJson(serviceSelection)
@@ -116,16 +131,22 @@ fun AppNavigation(
             val serviceSelection = gson.fromJson(json, ServiceSelection::class.java)
 
             CarDetailScreen(
+                container = container,
                 serviceSelection = serviceSelection,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onProceedToBooking = { bookingPayload ->
-                    // Similar encoding for next screen
                     val bookingJson = gson.toJson(bookingPayload)
                     val encodedBookingJson =
-                        URLEncoder.encode(bookingJson, StandardCharsets.UTF_8.toString())
-                    navController.navigate(Screen.Booking.createRoute(encodedBookingJson))
+                        URLEncoder.encode(
+                            bookingJson,
+                            StandardCharsets.UTF_8.toString()
+                        )
+
+                    navController.navigate(
+                        Screen.Booking.createRoute(encodedBookingJson)
+                    )
                 }
             )
         }
@@ -145,16 +166,14 @@ fun AppNavigation(
             val bookingPayload = gson.fromJson(json, BookingPayload::class.java)
 
             BookingScreen(
+                container = container,
                 bookingPayload = bookingPayload,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onBookingSuccess = {
-                    // Navigate to home or bookings screen
                     navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Main.route) {
-                            inclusive = false
-                        }
+                        popUpTo(Screen.Main.route) { inclusive = false }
                     }
                 }
             )

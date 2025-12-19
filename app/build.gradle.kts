@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
-    id("com.google.dagger.hilt.android")
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
 
@@ -12,9 +11,7 @@ plugins {
 
 android {
     namespace = "uk.ac.tees.mad.carease"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "uk.ac.tees.mad.carease"
@@ -58,6 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+//    implementation(libs.androidx.navigation.compose.jvmstubs)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,10 +71,6 @@ dependencies {
     kapt("androidx.room:room-compiler:2.7.0-alpha05")
     implementation("androidx.room:room-ktx:2.7.0-alpha05")
     implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation("com.google.dagger:hilt-android:2.57.1")
-    kapt("com.google.dagger:hilt-compiler:2.57.1")
-
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -105,7 +99,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
 
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // cloundinary
     implementation("com.cloudinary:cloudinary-android:3.1.1")

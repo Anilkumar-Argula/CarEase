@@ -5,19 +5,26 @@ import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.carease.data.api.WeatherApiService
-import uk.ac.tees.mad.carease.data.models.*
+import uk.ac.tees.mad.carease.data.local.BookingDao
+import uk.ac.tees.mad.carease.data.models.Area
+import uk.ac.tees.mad.carease.data.models.Booking
+import uk.ac.tees.mad.carease.data.models.Service
+import uk.ac.tees.mad.carease.data.models.UserProfile
+import uk.ac.tees.mad.carease.data.models.Weather
+import uk.ac.tees.mad.carease.data.models.WeatherCodeMapper
 import uk.ac.tees.mad.carease.utils.AreaCoordinates
 import uk.ac.tees.mad.carease.utils.LocationManager
-import javax.inject.Inject
 
-class HomeRepository @Inject constructor(
+class HomeRepository(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
     private val weatherApi: WeatherApiService,
-    private val locationManager: LocationManager
+    private val locationManager: LocationManager,
+    private val bookingDao: BookingDao
 ) {
 
     suspend fun getServices(): Result<List<Service>> {
@@ -155,25 +162,51 @@ class HomeRepository @Inject constructor(
         }
     }
 
+    fun getRecentBookingsFlow(): Flow<List<Booking>> {
+        val userId = auth.currentUser?.uid
+            ?: return kotlinx.coroutines.flow.flowOf(emptyList())
+
+        return bookingDao.getRecentBookings(userId)
+            .onStart {
+                // Refresh from Firebase in background
+                try {
+                    val snapshot = firestore.collection("bookings")
+                        .whereEqualTo("userId", userId)
+                        .limit(4)
+                        .get()
+                        .await()
+
+                    val bookings = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(Booking::class.java)?.copy(bookingId = doc.id)
+                    }
+
+                    bookingDao.insertAll(bookings)
+                } catch (e: Exception) {
+                    Log.e("HomeRepo", "Cache refresh failed: ${e.message}")
+                }
+            }
+    }
+
+    // Keep old method for compatibility if needed
     suspend fun getRecentBookings(): Result<List<Booking>> {
         return try {
             val userId = auth.currentUser?.uid
-            // never happen
-            if (userId == null) {
-                return Result.failure(Exception("User not found"))
-            }
+                ?: return Result.failure(Exception("User not found"))
+
             val snapshot = firestore.collection("bookings")
                 .whereEqualTo("userId", userId)
-//                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(4)
                 .get()
                 .await()
-            val booking = snapshot.documents.mapNotNull { doc ->
+
+            val bookings = snapshot.documents.mapNotNull { doc ->
                 doc.toObject(Booking::class.java)?.copy(bookingId = doc.id)
             }
 
-            Log.d("HR", "getRecentBookings: $booking")
-            Result.success(booking)
+            // Update cache
+            bookingDao.insertAll(bookings)
+
+            Result.success(bookings)
         } catch (e: Exception) {
             Result.failure(e)
         }

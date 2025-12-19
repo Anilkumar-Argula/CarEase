@@ -5,9 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.carease.data.models.BookingPayload
-import javax.inject.Inject
 
-class BookingRepository @Inject constructor(
+class BookingRepository(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) {

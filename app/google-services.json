@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "343190928230",
-    "project_id": "carease-16b8d",
-    "storage_bucket": "carease-16b8d.firebasestorage.app"
+    "project_number": "805754928450",
+    "project_id": "carease-b0f43",
+    "storage_bucket": "carease-b0f43.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:343190928230:android:b375bfa5b430683cac66a7",
+        "mobilesdk_app_id": "1:805754928450:android:aef8638db7f98dfd729cdb",
         "android_client_info": {
           "package_name": "uk.ac.tees.mad.carease"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBYFOzZwi8WVFvf20wGjqvp5oS7WuYtkVU"
+          "current_key": "AIzaSyDkCetdiHzaucFipgzgfSOimP-bijAkjzg"
         }
       ],
       "services": {

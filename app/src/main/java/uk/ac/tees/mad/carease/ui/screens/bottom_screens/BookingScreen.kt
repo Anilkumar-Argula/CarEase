@@ -14,7 +14,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,12 +63,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import uk.ac.tees.mad.carease.AppContainer
 import uk.ac.tees.mad.carease.data.models.BookingPayload
 import uk.ac.tees.mad.carease.data.models.ServiceSelection
 import uk.ac.tees.mad.carease.data.models.VehicleData
 import uk.ac.tees.mad.carease.viewmodels.BookingUiState
 import uk.ac.tees.mad.carease.viewmodels.BookingViewModel
+import uk.ac.tees.mad.carease.viewmodels.BookingViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,8 +82,13 @@ fun BookingScreen(
     bookingPayload: BookingPayload,
     onNavigateBack: () -> Unit,
     onBookingSuccess: () -> Unit,
-    viewModel: BookingViewModel = hiltViewModel()
+    container: AppContainer
 ) {
+
+    val viewModel: BookingViewModel = viewModel(
+        factory = BookingViewModelFactory(container.bookingRepository)
+    )
+
     val uiState by viewModel.uiState.collectAsState()
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
@@ -288,7 +309,6 @@ fun BookingScreenContent(
                 }
 
 
-
                 // CONFIRM BOOKING
                 Button(
                     onClick = onConfirmBooking,
@@ -429,7 +449,6 @@ fun BookingScreenPreview() {
         showDatePicker = false
     )
 }
-
 
 
 @Composable
@@ -622,11 +641,13 @@ fun TimeSlotCard(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp
                 )
+
                 isSelected && isAvailable -> Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Selected",
                     tint = Color(0xFF10B981)
                 )
+
                 isSelected && !isAvailable -> Icon(
                     imageVector = Icons.Default.Cancel,
                     contentDescription = "Not available",

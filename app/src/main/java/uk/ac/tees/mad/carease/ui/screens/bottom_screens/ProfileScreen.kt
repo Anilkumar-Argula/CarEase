@@ -63,7 +63,8 @@ fun ProfileScreen(
         onLogout = { viewModel.logout(onNavigateToLogin) },
         onRefresh = {
             viewModel.loadUserProfile()
-            viewModel.loadUserBookings()
+//            viewModel.loadUserBookings()
+//            viewModel.refre
         },
         onNavigateToBookingDetails = onNavigateToBookingDetails
     )
@@ -565,11 +566,12 @@ fun BookingCard(
     onCancel: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
+    val formattedDate = booking.scheduledDate?.let { formatTimestamp(it) } ?: "N/A"
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(
+//            .clickable { onClick() },
+        ,colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
         shape = RoundedCornerShape(12.dp),
@@ -596,6 +598,11 @@ fun BookingCard(
                     Text(
                         text = "${booking.carMake} ${booking.carModel}",
                         fontSize = 14.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                    Text(
+                        text = formattedDate,
+                        fontSize = 12.sp,
                         color = Color(0xFF6B7280)
                     )
                     Text(

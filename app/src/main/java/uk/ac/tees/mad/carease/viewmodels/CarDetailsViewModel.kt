@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +11,6 @@ import kotlinx.coroutines.launch
 import uk.ac.tees.mad.carease.data.models.Addon
 import uk.ac.tees.mad.carease.data.models.VehicleData
 import uk.ac.tees.mad.carease.data.repository.CarDetailsRepository
-import javax.inject.Inject
 
 data class CarDetailsUiState(
     val isLoading: Boolean = false,
@@ -29,8 +27,7 @@ data class CarDetailsUiState(
     val canProceed: Boolean = false
 )
 
-@HiltViewModel
-class CarDetailsViewModel @Inject constructor(
+class CarDetailsViewModel(
     private val repository: CarDetailsRepository
 ) : ViewModel() {
 

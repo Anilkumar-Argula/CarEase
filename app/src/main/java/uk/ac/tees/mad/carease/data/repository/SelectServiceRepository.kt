@@ -4,9 +4,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.carease.data.models.Area
 import uk.ac.tees.mad.carease.data.models.Service
-import javax.inject.Inject
 
-class SelectServiceRepository @Inject constructor(
+class SelectServiceRepository(
     private val firestore: FirebaseFirestore
 ) {
 

@@ -1,8 +1,16 @@
 package uk.ac.tees.mad.carease.data.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.google.firebase.Timestamp
 
-data class Booking (
+
+@Entity(tableName = "bookings")
+@TypeConverters(TimestampConverter::class)
+data class Booking(
+    @PrimaryKey
     val bookingId: String = "",
     val userId: String = "",
     val serviceName: String = "",
@@ -17,3 +25,16 @@ data class Booking (
     val createdAt: Timestamp? = null
 
 )
+
+class TimestampConverter {
+
+    @TypeConverter
+    fun fromTimestamp(value: Timestamp?): Long? {
+        return value?.toDate()?.time
+    }
+
+    @TypeConverter
+    fun toTimestamp(value: Long?): Timestamp? {
+        return value?.let { Timestamp(it / 1000, 0) }
+    }
+}

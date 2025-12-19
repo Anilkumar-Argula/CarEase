@@ -9,11 +9,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.carease.utils.CloudinaryConfig
-import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class CarDetailsRepository @Inject constructor(
+class CarDetailsRepository(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) {
